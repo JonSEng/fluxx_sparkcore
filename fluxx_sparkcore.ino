@@ -43,19 +43,19 @@ int hits = 0;
 Wtv020sd16p wtv020sd16p(resetPin, clockPin, dataPin, busyPin);
 
 void setup() {
-  Spark.function("power_up", powrrup);
+    Spark.function("power_up", powrrup);
 
-  wtv020sd16p.reset();
-  pinMode(BUTTON, INPUT_PULLUP);
-  pinMode(MAGNET_SWITCH, INPUT_PULLUP);
-  pinMode(ledPin, OUTPUT);
+    wtv020sd16p.reset();
+    pinMode(BUTTON, INPUT_PULLUP);
+    pinMode(MAGNET_SWITCH, INPUT_PULLUP);
+    pinMode(ledPin, OUTPUT);
 
-  //pinMode(PIXEL_PIN, OUTPUT);
-  strip.begin();
-  strip.show(); // Initialize all pixels to 'off'
+    //pinMode(PIXEL_PIN, OUTPUT);
+    strip.begin();
+    strip.show(); // Initialize all pixels to 'off'
 }
 
-int powrrup(String poww){
+int powrrup(String poww) {
    strip.show();
    powerUp(strip.Color(0, 0, 255), 50);
    int powww = (poww.charAt(1) - '0') - 1;
@@ -63,9 +63,7 @@ int powrrup(String poww){
    power ++ ;
 }
 
-
 void loop() {
-
     // Get current button state.
     bool newState = digitalRead(BUTTON);
     bool mswitch = digitalRead(MAGNET_SWITCH);
