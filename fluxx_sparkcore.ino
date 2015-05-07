@@ -44,6 +44,7 @@ int hits = 0;
 Wtv020sd16p wtv020sd16p(resetPin, clockPin, dataPin, busyPin);
 
 void setup() {
+  Spark.function("powrrup", powrrup);
   wtv020sd16p.reset();
   pinMode(BUTTON, INPUT_PULLUP);
   pinMode(MAGNET_SWITCH, INPUT_PULLUP);
@@ -52,6 +53,19 @@ void setup() {
   strip.begin();
   strip.show(); // Initialize all pixels to 'off'
 }
+
+int powrrup(String poww){
+    int powww = poww.toInt();
+      if (powww < 0 || powww > 15) return -1;
+      for (int i = 0; i < powww; i++){
+       //power++ ;
+       strip.show();
+       powerUp(strip.Color(0, 0, 255), 50);
+      }
+    
+
+}
+
 
 void loop() {
 
@@ -64,7 +78,7 @@ void loop() {
     // Check if button is still low after debounce.
     mswitch = digitalRead(MAGNET_SWITCH);
     if (mswitch == LOW) {
-      //digitalWrite(ledPin, HIGH);
+      digitalWrite(ledPin, HIGH);
       strip.show();
       powerUp(strip.Color(255, 0, 0), 50);
     }
@@ -77,7 +91,7 @@ void loop() {
     // Check if button is still low after debounce.
     newState = digitalRead(BUTTON);
     if (newState == LOW) {
-      //digitalWrite(ledPin, HIGH);
+      digitalWrite(ledPin, HIGH);
       showType++;
       bpress++;
       if (bpress % 3 == 0) {
@@ -105,16 +119,16 @@ void startShow(int i) {
   strip.setBrightness(100);
   switch (i) {
     case 0: colorWipe(strip.Color(0, 0, 0), 50);    // Black/off
-      //wtv020sd16p.playVoice(1);
+      wtv020sd16p.playVoice(1);
       break;
     case 1: colorWipe(strip.Color(255, 0, 0), 50); //red
-      //wtv020sd16p.playVoice(1);
+      wtv020sd16p.playVoice(1);
       break;
     case 2: colorWipe(strip.Color(0, 255, 0), 50);  // Green
-       //wtv020sd16p.playVoice(2);
+       wtv020sd16p.playVoice(2);
       break;
     case 3: colorWipe(strip.Color(0, 0, 255), 50);  // Blue
-       //wtv020sd16p.playVoice(3);
+       wtv020sd16p.playVoice(3);
       break;
     case 4: theaterChase(strip.Color(127, 127, 127), 50); // White
       break;
@@ -129,6 +143,12 @@ void startShow(int i) {
     case 9: theaterChaseRainbow(50);
       break;
   }
+  for (int blinkloop = 0; blinkloop < 3; blinkloop++){
+       digitalWrite(ledPin, HIGH);
+       delay(500);               // wait for a second
+       digitalWrite(ledPin, LOW);    // turn the LED off by making the voltage LOW
+       delay(500);
+     }
 }
 
 // Fill the dots one after the other with a color
