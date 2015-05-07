@@ -3,8 +3,8 @@
 // press the button it will change to a new pixel animation.  Note that you need to press the
 // button once to start the first animation!
 
-#include "neopixel.h"
-#include "Wtv020sd16p.h"
+#include "neopixel/neopixel.h"
+#include "Wtv020sd16p/Wtv020sd16p.h"
 
 
 int resetPin = 3;  // The pin number of the reset pin.
@@ -34,78 +34,53 @@ int busyPin = 0;  // The pin number of the busy pin.
 
 Adafruit_NeoPixel strip = Adafruit_NeoPixel(PIXEL_COUNT, PIXEL_PIN, PIXEL_TYPE);
 
-
-
 bool oldState = HIGH;
+bool oldmswitch = HIGH;
 int showType = 1;
-int power = 0;  //total power credit
+//int leds = 16;
+int power = 0;
 int bpress = 0;
 int hits = 0;
 Wtv020sd16p wtv020sd16p(resetPin, clockPin, dataPin, busyPin);
 
 void setup() {
-  Spark.function("power_up", powrrup);
-
   wtv020sd16p.reset();
   pinMode(BUTTON, INPUT_PULLUP);
   pinMode(MAGNET_SWITCH, INPUT_PULLUP);
-  pinMode(ledPin, OUTPUT);
-
   //pinMode(PIXEL_PIN, OUTPUT);
   wtv020sd16p.reset();
   strip.begin();
   strip.show(); // Initialize all pixels to 'off'
 }
 
-int powrrup(String poww){
-     strip.show();
-      powerUp(strip.Color(0, 0, 255), 50);
-     int powww = (poww.charAt(1) - '0') - 1;
-      if (powww < 0 || powww > 1) return -1;
-       power ++ ;
-
-
-}
-
-
 void loop() {
 
-  // Get current button state.
+ // Get current button state.
   bool newState = digitalRead(BUTTON);
   bool mswitch = digitalRead(MAGNET_SWITCH);
-  bool powrr = false;
-
-   //Code to power up
+  
    if (mswitch == LOW && oldState == HIGH) {
-    // Short delay to debounce button.
     delay(20);
-    powrr = true;
     // Check if button is still low after debounce.
     mswitch = digitalRead(MAGNET_SWITCH);
     if (mswitch == LOW) {
-      digitalWrite(ledPin, HIGH);
-      showType++;
-      power++;
-      if (showType > 3) {
-        showType = 1;
-      }
+      //digitalWrite(ledPin, HIGH);
       strip.show();
-      powerUp(strip.Color(0, 0, 255), 50);
+      powerUp(strip.Color(255, 0, 0), 50);
     }
- }
-
+      //
+  }
+ 
   // Check if state changed from high to low (button press).
   if (newState == LOW && oldState == HIGH) {
-      powrr = false;
-    // Short delay to debounce button.
     delay(20);
     // Check if button is still low after debounce.
     newState = digitalRead(BUTTON);
     if (newState == LOW) {
-
+      //digitalWrite(ledPin, HIGH);
       showType++;
       bpress++;
-      if (bpress % 5 == 0) {
+      if (bpress % 3 == 0) {
         hits++;
       }
       if (showType > 3) {
@@ -114,29 +89,32 @@ void loop() {
       strip.show();
       startShow(showType);
     }
+      //
   }
-
+  
 
   // Set the last button state to the old state.
-
-    oldState = newState;
-
+  oldState = newState;
+  oldmswitch = mswitch;
 }
+
+
+
 
 void startShow(int i) {
   strip.setBrightness(100);
   switch (i) {
     case 0: colorWipe(strip.Color(0, 0, 0), 50);    // Black/off
-      wtv020sd16p.playVoice(1);
+      //wtv020sd16p.playVoice(1);
       break;
     case 1: colorWipe(strip.Color(255, 0, 0), 50); //red
-      wtv020sd16p.playVoice(2);
+      //wtv020sd16p.playVoice(1);
       break;
     case 2: colorWipe(strip.Color(0, 255, 0), 50);  // Green
-       wtv020sd16p.playVoice(3);
+       //wtv020sd16p.playVoice(2);
       break;
     case 3: colorWipe(strip.Color(0, 0, 255), 50);  // Blue
-       wtv020sd16p.playVoice(4);
+       //wtv020sd16p.playVoice(3);
       break;
     case 4: theaterChase(strip.Color(127, 127, 127), 50); // White
       break;
@@ -151,12 +129,6 @@ void startShow(int i) {
     case 9: theaterChaseRainbow(50);
       break;
   }
-  for (int blinkloop = 0; blinkloop < 3; blinkloop++){
-       digitalWrite(ledPin, HIGH);
-       delay(500);               // wait for a second
-       digitalWrite(ledPin, LOW);    // turn the LED off by making the voltage LOW
-       delay(500);
-     }
 }
 
 // Fill the dots one after the other with a color
@@ -169,8 +141,8 @@ void colorWipe(uint32_t c, uint8_t wait) {
     delay(wait);
     strip.show();
   }
-
-  for (uint16_t i = power - hits; i < 16; i++) {
+  
+  for (uint16_t i = (power - hits); i < 16; i++) {
     strip.setPixelColor(i, 0);
     delay(wait);
     strip.show();
@@ -178,15 +150,16 @@ void colorWipe(uint32_t c, uint8_t wait) {
   }
 }
 
-//Lights up neopixel incrementally as nurse/other kid helps power up
 void powerUp(uint32_t c, uint8_t wait) {
+
+  power++;
 
   for (uint16_t i = 0; i < (power); i++) {
     strip.setPixelColor(i, c);
     delay(wait);
     strip.show();
   }
-
+  
   for (uint16_t i = power; i < 16; i++) {
     strip.setPixelColor(i, 0);
     delay(wait);
@@ -270,3 +243,5 @@ uint32_t Wheel(byte WheelPos) {
     return strip.Color(WheelPos * 3, 255 - WheelPos * 3, 0);
   }
 }
+
+
